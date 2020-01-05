@@ -163,7 +163,7 @@ dictConfig(
             }
         },
         "formatters": {
-            "basic": {"format": "[%(asctime)s][%(levelname)s] %(name)s: %(message)s"}
+            "basic": {"format": "[%(asctime)s][%(levelname)s] %(module)s: %(message)s"}
         },
         "loggers": {"": {"level": "ERROR", "handlers": ["default"]}},
     }
