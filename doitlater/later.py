@@ -82,16 +82,11 @@ class Worker(threading.Thread):
 
 class Later(object):
     def __init__(
-        self,
-        workers: Optional[int] = None,
-        ignore_errors: bool = False,
-        logging_level: int = logging.INFO,
-        logging_format: str = "",
+        self, workers: Optional[int] = None, ignore_errors: bool = False,
     ):
         if not workers:
             workers = multiprocessing.cpu_count()
 
-        self.__log_level = logging_level
         self.__queue = queue.Queue()
         self.__workers = [Worker(self.__queue, ignore_errors) for _ in range(workers)]
 
@@ -101,7 +96,9 @@ class Later(object):
     def on(
         self,
         exactly: datetime,
-        repeat: Union[timedelta, Iterable[timedelta]] = None,
+        repeat: Union[
+            timedelta, Iterable[timedelta], datetime, Iterable[datetime]
+        ] = None,
         loop: bool = True,
     ) -> Callable:
 
