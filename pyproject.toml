@@ -1,12 +1,19 @@
 [tool.poetry]
 name = "DoItLater"
-version = "0.1.0"
+version = "0.1.1"
 description = "When you have to do something... later."
 authors = ["Evaldas Kazlauskis <evaldas@evalkaz.com>"]
 license = "MIT"
 
+readme = "README.md"
+
+repository = "https://github.com/evalkaz/doitlater"
+homepage = "https://github.com/evalkaz/doitlater"
+
+keywords = ['scheduling', 'later']
+
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.4"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

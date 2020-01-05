@@ -1,6 +1,5 @@
 
 # DoItLater
-> *When you have to do something... later.*
 
 A simple python library to schedule work in the future with ability to loop infinitely. Does not depend on any 3rd party libraries.
 
