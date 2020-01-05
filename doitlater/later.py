@@ -1,4 +1,5 @@
 import logging
+from logging.config import dictConfig
 import multiprocessing
 import threading
 from datetime import datetime, timedelta
@@ -38,16 +39,27 @@ class Worker(threading.Thread):
 
             # Call the function.
             try:
+                logging.debug("Executing %s.", work.func.__name__)
                 res = work.func()
             except Exception as e:
+                logging.error("%s threw an exception '%s'", work.func.__name__, e)
+                res = None
+
                 if not self.__ignore:
                     raise e
-                res = None
+                else:
+                    logging.info("Exception was ignored.")
+
             finally:
+                logging.info("%s finished work.", work.func.__name__)
                 self.__q.task_done()
 
             # The task indicated to stop, break the loop.
             if res is not None and res is False:
+                logging.info(
+                    "Stopping %s task because function returned false.",
+                    work.func.__name__,
+                )
                 break
 
             # If we have to repeat.
@@ -58,6 +70,11 @@ class Worker(threading.Thread):
                     work.repeat.append(next_time)
                 work.date += next_time
                 self.__q.put(work)
+                logging.debug(
+                    "Put %s task in the queue. Next execution on %s.",
+                    work.func.__name__,
+                    work.date,
+                )
 
     def stop(self):
         self.__stop = True
@@ -67,8 +84,9 @@ class Later(object):
     def __init__(
         self,
         workers: Optional[int] = None,
-        logging_level: int = logging.INFO,
         ignore_errors: bool = False,
+        logging_level: int = logging.INFO,
+        logging_format: str = "",
     ):
         if not workers:
             workers = multiprocessing.cpu_count()
@@ -109,6 +127,11 @@ class Later(object):
             work = Work(exactly, func, repeat, loop)
             self.__queue.put(work)
 
+            logging.info(
+                "Put %s task in the queue. Will be executed on %s.",
+                work.func.__name__,
+                work.date,
+            )
             self.__last_func = func
 
         return decorator
@@ -118,8 +141,30 @@ class Later(object):
             for w in self.__workers:
                 w.start()
 
+            logging.debug("Started all workers.")
             self.__queue.join()
+
         except Exception as e:
+            logging.debug("Stopping all workers.")
             for w in self.__workers:
                 w.stop()
             raise e
+
+
+dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": True,
+        "handlers": {
+            "default": {
+                "level": "INFO",
+                "formatter": "basic",
+                "class": "logging.StreamHandler",
+            }
+        },
+        "formatters": {
+            "basic": {"format": "[%(asctime)s][%(levelname)s] %(name)s: %(message)s"}
+        },
+        "loggers": {"": {"level": "ERROR", "handlers": ["default"]}},
+    }
+)
