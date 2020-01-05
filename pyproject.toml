@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "DoItLater"
-version = "0.1.1"
+version = "0.1.2"
 description = "When you have to do something... later."
 authors = ["Evaldas Kazlauskis <evaldas@evalkaz.com>"]
 license = "MIT"
