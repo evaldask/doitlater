@@ -34,8 +34,10 @@ class Worker(threading.Thread):
             work = self.__q.get(block=False)
 
             # Wait until right time.
-            to_wait = work.date - datetime.now()
-            time.sleep(to_wait.total_seconds())
+            to_wait = (work.date - datetime.now()).total_seconds()
+
+            if to_wait > 0:
+                time.sleep(to_wait)
 
             # Call the function.
             try:
